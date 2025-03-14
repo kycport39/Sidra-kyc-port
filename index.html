@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>KYC Verification</title>
+</head>
+<body>
+    <h2>Live KYC Verification</h2>
+    <video id="video" width="320" height="240" autoplay></video>
+    <button id="capture">Capture</button>
+    <canvas id="canvas" width="320" height="240"></canvas>
+    <button id="upload">Upload</button>
+
+    <script>
+        let video = document.getElementById("video");
+        let canvas = document.getElementById("canvas");
+        let context = canvas.getContext("2d");
+
+        // ✅ Camera Access
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => video.srcObject = stream)
+            .catch(error => alert("Camera access denied!"));
+
+        // ✅ Capture Image
+        document.getElementById("capture").addEventListener("click", function() {
+            context.drawImage(video, 0, 0, 320, 240);
+        });
+
+        // ✅ Upload Image
+        document.getElementById("upload").addEventListener("click", function() {
+            let imageData = canvas.toDataURL("image/png");
+
+            fetch("https://yourserver.com/upload", {
+                method: "POST",
+                body: JSON.stringify({ image: imageData }),
+                headers: { "Content-Type": "application/json" }
+            }).then(response => response.json())
+              .then(data => alert("✅ Image uploaded! Link: " + data.url))
+              .catch(error => console.error(error));
+        });
+    </script>
+</body>
+</html>
